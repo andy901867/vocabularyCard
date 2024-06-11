@@ -1,0 +1,12 @@
+{
+    "data":[
+        {
+            "groupId": "firstGroup",
+            "name": "group A"
+        },
+        {
+            "groupId": "secondGroup",
+            "name": "group B"
+        }
+    ]
+}

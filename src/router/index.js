@@ -11,6 +11,12 @@ const routes = [
     component: HomeView
   },
   {
+    path: '/cardGroup/:groupId',
+    name: 'cardGroup',
+    component:() => import(/* webpackChunkName: "CardGroup" */ '../views/CardGroup.vue'),
+    props: (route) => route.params,
+  },
+  {
     path: '/about',
     name: 'about',
     // route level code-splitting
@@ -21,7 +27,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
+  mode:'history'
 })
 
 export default router
