@@ -12,6 +12,7 @@
 export default {
   created(){
     this.$store.dispatch('fetchCardGroups')
+    this.$store.dispatch('initFetchVocaularies')
   }
 }
 </script>

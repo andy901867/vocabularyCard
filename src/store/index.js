@@ -18,23 +18,9 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex);
 
-// const animalVoc = [
-//     {name:'dog',translate:'狗',id:'jij'},
-//     {name:'cat',translate:'貓',id:'jijd'},
-//     {name:'sheep',translate:'綿羊',id:'jidjd'},
-//     {name:'elephant',translate:'象',id:'jifjd'},
-// ]
-// const fruitVoc = [
-//     {name:'apple',translate:'蘋果',id:'jdij'},
-//     {name:'mango',translate:'芒果',id:'jifjd'},
-// ]
-
 const store = new Vuex.Store({
     state:{
-        cardGroups:[
-            // {name:'動物',groupId:'xxxx',vocabularies:animalVoc},
-            // {name:'水果',groupId:'yyyy',vocabularies:fruitVoc}
-        ],
+        cardGroups:[],
         vocabularies: []
     },
     //actions負責非同步操作
@@ -54,22 +40,49 @@ const store = new Vuex.Store({
                 console.log(error)
             }
         },
-        fetchVocaularies(context, groupId){
-            return fetch("/json/vocabularies.json")
+        initFetchVocaularies(context){
+            //預設單字資料
+            const promise1 = fetch("/json/vocabularies.json")
             .then(response => response.json())
             .then(data => {
-                const vocData = data[groupId];
-                if(vocData){
-                    vocData.forEach(voc=>{
+                //整理JSON檔案的預設單字資料
+                let allVocabularies = [];
+                for(let prop in data){
+                    let groupId = prop;
+                    let vocabularies = data[groupId]
+                    vocabularies.forEach(voc=>{
                         voc.groupId = groupId;
                     })
-                    context.commit('setVocabularies', vocData);
-                    return vocData;
+                    allVocabularies = allVocabularies.concat(vocabularies);
                 }
+                return allVocabularies;                                
+            })
+
+            //localStorage當中的單字資料
+            const promise2 = context.dispatch("getLocalStorageVocabularies").then(userVocabularies=>{
+                return userVocabularies;
+            })
+
+            Promise.all([promise1, promise2]).then((data)=>{
+                const allVocabularies = data[0].concat(data[1]);
+                context.commit('setVocabularies', allVocabularies);
             })
         },
-        addVocabulary(context,payload){
-            context.commit('addVocabulary',payload);
+        getLocalStorageVocabularies(){
+            const userVocabulariesString = localStorage.getItem("user_vocabularies");
+            let userVocabularies = [];
+            if(userVocabulariesString){
+                userVocabularies = JSON.parse(userVocabulariesString);
+            }
+            return userVocabularies;
+        },
+        addVocabulary(context,newVoc){
+            context.commit('setAddVocabulary',newVoc);
+            //同步加到localStorage
+            context.dispatch("getLocalStorageVocabularies").then(userVocabularies=>{
+                userVocabularies.push(newVoc);
+                localStorage.setItem("user_vocabularies",JSON.stringify(userVocabularies));
+            });
         }
     },
     //mutations負責更新狀態(state)
@@ -77,14 +90,11 @@ const store = new Vuex.Store({
         setCardGroups(state,cardGroups){
             state.cardGroups = cardGroups
         },
-        setVocabularies(state,vocData){
-            state.vocabularies = state.vocabularies.concat(vocData);
+        setVocabularies(state,vocabularies){
+            state.vocabularies = vocabularies;
         },
-        addVocabulary(state,payload){
-            console.log(state)
-            console.log(payload)
-            let targetGroup = state.cardGroups.find(cardGroup => cardGroup.groupId === payload.groupId);
-            targetGroup.vocabularies.push(payload.vocabulary);
+        setAddVocabulary(state,newVoc){
+            state.vocabularies.push(newVoc);
         }
     }
 });

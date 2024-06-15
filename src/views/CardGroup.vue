@@ -19,7 +19,7 @@
 <script>
 import VocabularyCard from '@/components/VocabularyCard.vue'
 import AddVocabularyModal from '@/components/AddVocabularyModal.vue'
-import { Modal } from 'bootstrap'
+//import { Modal } from 'bootstrap'
 // import {db} from '@/store/db'
 // import { collection, getDocs, } from "firebase/firestore";
 
@@ -31,19 +31,11 @@ export default {
   },
   data(){
     return {
-      vocabularies:[],
       selectedVoc:'',
       allowSlide:true,
 
-      addVocabularyModal:''
+      //addVocabularyModal:null
     }
-  },
-  created(){
-    //撈取vocabularies資料
-    this.$store.dispatch("fetchVocaularies",this.groupId).then(data=>{
-      this.vocabularies = data;
-      this.initFirstShowedVoc()
-    });
   },
   mounted(){
     //檢查localStorage中是否有上一個單字停留的紀錄，有的話跳至該單字
@@ -68,11 +60,14 @@ export default {
     
     
     //將addVocabularyModal儲存在變數中
-    this.addVocabularyModal = new Modal(this.$refs.addVocabularyModal.$el);
+    //this.addVocabularyModal = new Modal(this.$refs.addVocabularyModal.$el);
   },
   computed:{
     cardGroup(){
       return this.$store.state.cardGroups.find(cardGroup =>cardGroup.groupId === this.$route.params.groupId);
+    },
+    vocabularies(){
+      return this.$store.state.vocabularies.filter(voc => voc.groupId == this.groupId);
     }
   },
   watch: {
@@ -182,7 +177,7 @@ export default {
       window.requestAnimationFrame(step);
     },
     openAddModal(){      
-      this.addVocabularyModal.show()
+      this.$refs.addVocabularyModal.showModal();
     },    
     initFirstShowedVoc(){
       const keyName = this.$route.params.groupId;
