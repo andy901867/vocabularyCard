@@ -66,13 +66,13 @@ export default {
             this.translate = "";
             this.hideModal();
         },
-        addVocabulary(){
-            
+        addVocabulary(){            
             var newVoc = {
                 name:this.vocName,
                 translate:this.translate,
                 id: GenerateRandomId(6),
-                groupId:this.groupId
+                groupId:this.groupId,
+                canDeleted: true
             }
             this.$store.dispatch('addVocabulary',newVoc)
         },

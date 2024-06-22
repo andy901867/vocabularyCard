@@ -1,15 +1,18 @@
 <template>
   <div class="flex-grow-1 d-flex flex-column container py-3" style="max-width:500px;">
-    <div class="d-flex justify-content-between align-items-end">
-      <!-- <h1>單字主題: {{cardGroup.name}}</h1> -->
-      <button class="btn btn-sm btn-primary" @click="openAddModal()">+</button>
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div>
+        <span class="text-muted fz14">單字主題:</span>
+        <h1 class="mb-0">{{cardGroup.name}}</h1>
+      </div>
+      <button class="btn btn-sm btn-primary" @click="openAddModal()"><i class="fa-solid fa-plus me-1"></i>新增單字卡</button>
     </div>
     <div class="slide_container overflow-hidden d-flex flex-grow-1 w-100 position-relative" ref="slideContainer">
       <vocabulary-card v-for="voc in vocabularies" :key="voc.id" :vocabulary="voc" ref="slidePage"></vocabulary-card>
     </div>
     <div class="p-2 d-flex justify-content-center">
-      <button class="btn btn-light mx-1" @click="previousVoc()">左</button>
-      <button class="btn btn-light mx-1" @click="nextVoc()">右</button>
+      <button class="btn btn-light mx-1" @click="previousVoc()"><i class="fa-solid fa-angle-left"></i></button>
+      <button class="btn btn-light mx-1" @click="nextVoc()"><i class="fa-solid fa-angle-right"></i></button>
     </div>
 
     <add-vocabulary-modal :groupId="groupId" ref="addVocabularyModal"></add-vocabulary-modal>
@@ -33,34 +36,8 @@ export default {
     return {
       selectedVoc:'',
       allowSlide:true,
-
-      //addVocabularyModal:null
+      isInitialized: false
     }
-  },
-  mounted(){
-    //檢查localStorage中是否有上一個單字停留的紀錄，有的話跳至該單字
-    // const keyName = this.cardGroup.groupId;
-    // let selectedCardString = window.localStorage.getItem('selectedCard');
-    // console.log(selectedCardString)
-    // let selectedCard = JSON.parse(selectedCardString) || '';
-    // let lastVocabularyId = selectedCard[keyName];
-    // if(selectedCard && lastVocabularyId){
-    //   this.selectedVoc = this.vocabularies.find(voc => voc.id === lastVocabularyId);
-      
-    //   let slideContainer = this.$refs.slideContainer;
-    //   let currentIndex = this.vocabularies.findIndex(voc => voc.id === this.selectedVoc.id);
-    //   let slidePage = this.$refs.slidePage[currentIndex].$el; 
-    //   let endDistance = slidePage.offsetLeft;
-    //   slideContainer.scrollLeft = endDistance;
-      
-    // }
-    // else{
-    //   this.selectedVoc = this.vocabularies[0];
-    // }
-    
-    
-    //將addVocabularyModal儲存在變數中
-    //this.addVocabularyModal = new Modal(this.$refs.addVocabularyModal.$el);
   },
   computed:{
     cardGroup(){
@@ -71,15 +48,17 @@ export default {
     }
   },
   watch: {
-    // selectedVoc(value){
-    //   //操作localStorage時，其值須為字串，因此要儲存object的值時要先用JSON.Stringify字串化
-    //   const keyName = this.$route.params.groupId;
-    //   let selectedCardString = window.localStorage.getItem('selectedCard');
-    //   let selectedCard = JSON.parse(selectedCardString) || {};
-
-    //   selectedCard[keyName] = value.id;
-    //   window.localStorage.setItem('selectedCard',JSON.stringify(selectedCard));
-    // }
+    vocabularies(value,oldValue){
+      if(value.length>0 && !this.isInitialized){
+        this.jumpToVoc(value[0].id);
+        this.isInitialized = true;
+      }
+      else if(value.length>oldValue.length){
+        let oldVocIds = oldValue.map(voc=> voc.id);
+        const newVoc = value.find(voc => !oldVocIds.includes(voc.id));
+        this.jumpToVoc(newVoc.id);
+      }
+    }
   },
   props:{
     groupId:{},
@@ -89,16 +68,10 @@ export default {
       if(!this.allowSlide){
         return;
       }
-      this.allowSlide = false;
-
       let currentIndex = this.vocabularies.findIndex(voc => voc.id === this.selectedVoc.id);
       let nextIndex = currentIndex + 1;
       if(this.vocabularies[nextIndex]){
-        let slidePage = this.$refs.slidePage[nextIndex].$el; 
-        let endDistance = slidePage.offsetLeft; //備註: 要取得想要的offsetLeft值時，其父元素必須為可定位元素(ex:position:relative)
-        this.moveSlidePosition(endDistance,()=>{
-          this.allowSlide = true;
-        })
+        this.jumpToVoc(this.vocabularies[nextIndex].id);
       }
       else{
         //最後一個slide到第一個
@@ -121,16 +94,11 @@ export default {
       if(!this.allowSlide){
         return;
       }
-      this.allowSlide = false;
       
       let currentIndex = this.vocabularies.findIndex(voc => voc.id === this.selectedVoc.id);
       let previousIndex = currentIndex - 1;
       if(this.vocabularies[previousIndex]){
-        let slidePage = this.$refs.slidePage[previousIndex].$el; 
-        let endDistance = slidePage.offsetLeft;
-        this.moveSlidePosition(endDistance,()=>{
-          this.allowSlide = true;
-        })
+        this.jumpToVoc(this.vocabularies[previousIndex].id);
       }
       else{
         //第一個slide到最後一個
@@ -150,6 +118,21 @@ export default {
         })
       }
       this.selectedVoc = this.vocabularies[previousIndex];
+    },
+    jumpToVoc(vocId){
+      let targetIndex = this.vocabularies.findIndex(voc => voc.id === vocId);
+      this.$nextTick(()=>{
+        this.allowSlide = false;
+        let slidePage = this.$refs.slidePage[targetIndex].$el;
+        let endDistance = slidePage.offsetLeft; //備註: 要取得想要的offsetLeft值時，其父元素必須為可定位元素(ex:position:relative)
+        this.moveSlidePosition(endDistance,()=>{
+          this.allowSlide = true;
+        })
+      })
+      
+      let targetVocabulary = this.vocabularies.find(voc=> voc.id === vocId);
+      this.selectedVoc = targetVocabulary;
+
     },
     moveSlidePosition(endDistance,callback){
       let slideContainer = this.$refs.slideContainer;
@@ -178,30 +161,6 @@ export default {
     },
     openAddModal(){      
       this.$refs.addVocabularyModal.showModal();
-    },    
-    initFirstShowedVoc(){
-      const keyName = this.$route.params.groupId;
-      let selectedCardString = window.localStorage.getItem('selectedCard');
-      let selectedCard = JSON.parse(selectedCardString) || '';
-      let lastVocabularyId = selectedCard[keyName];
-
-      if(selectedCard && lastVocabularyId){
-        let selectedVoc = this.vocabularies.find(voc => voc.id === lastVocabularyId);
-        if(selectedVoc){
-          this.selectedVoc = selectedVoc;
-          let slideContainer = this.$refs.slideContainer;
-          let currentIndex = this.vocabularies.findIndex(voc => voc.id === this.selectedVoc.id);
-          let slidePage = this.$refs.slidePage[currentIndex].$el; 
-          let endDistance = slidePage.offsetLeft;
-          slideContainer.scrollLeft = endDistance;
-        }
-        else{
-          this.selectedVoc = this.vocabularies[0];
-        }        
-      }
-      else{
-        this.selectedVoc = this.vocabularies[0];
-      }
     }
   }
 }

@@ -52,6 +52,7 @@ const store = new Vuex.Store({
                     let vocabularies = data[groupId]
                     vocabularies.forEach(voc=>{
                         voc.groupId = groupId;
+                        voc.canDeleted = false;
                     })
                     allVocabularies = allVocabularies.concat(vocabularies);
                 }

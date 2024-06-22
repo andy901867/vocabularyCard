@@ -20,8 +20,7 @@ export default {
         }
     },
     mounted(){
-        var i = 0;
-        console.log(i)
+
     },
     props:{
         vocabulary:{
