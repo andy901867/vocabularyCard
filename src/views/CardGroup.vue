@@ -8,7 +8,7 @@
       <button class="btn btn-sm btn-primary" @click="openAddModal()"><i class="fa-solid fa-plus me-1"></i>新增單字卡</button>
     </div>
     <div class="slide_container overflow-hidden d-flex flex-grow-1 w-100 position-relative" ref="slideContainer">
-      <vocabulary-card v-for="voc in vocabularies" :key="voc.id" :vocabulary="voc" ref="slidePage"></vocabulary-card>
+      <vocabulary-card v-for="voc in vocabularies" :key="voc.id" :vocabulary="voc" ref="slidePage" @openDeleteModal="handleOpenDeleteModal"></vocabulary-card>
     </div>
     <div class="p-2 d-flex justify-content-center">
       <button class="btn btn-light mx-1" @click="previousVoc()"><i class="fa-solid fa-angle-left"></i></button>
@@ -16,12 +16,14 @@
     </div>
 
     <add-vocabulary-modal :groupId="groupId" ref="addVocabularyModal"></add-vocabulary-modal>
+    <delete-vocabulary-modal :groupId="groupId" ref="deleteVocabularyModal"></delete-vocabulary-modal>
   </div>
 </template>
 
 <script>
 import VocabularyCard from '@/components/VocabularyCard.vue'
 import AddVocabularyModal from '@/components/AddVocabularyModal.vue'
+import DeleteVocabularyModal from '@/components/DeleteVocabularyModal.vue'
 //import { Modal } from 'bootstrap'
 // import {db} from '@/store/db'
 // import { collection, getDocs, } from "firebase/firestore";
@@ -30,7 +32,8 @@ export default {
   name:'CardGroup',
   components:{
     VocabularyCard,
-    AddVocabularyModal
+    AddVocabularyModal,
+    DeleteVocabularyModal
   },
   data(){
     return {
@@ -161,6 +164,9 @@ export default {
     },
     openAddModal(){      
       this.$refs.addVocabularyModal.showModal();
+    },
+    handleOpenDeleteModal(vocabulary){
+      this.$refs.deleteVocabularyModal.showModal(vocabulary);
     }
   }
 }

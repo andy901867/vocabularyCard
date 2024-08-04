@@ -84,6 +84,16 @@ const store = new Vuex.Store({
                 userVocabularies.push(newVoc);
                 localStorage.setItem("user_vocabularies",JSON.stringify(userVocabularies));
             });
+        },
+        deleteVocabulary(context,vocId){
+            const vocabularies = context.state.vocabularies;
+            const deletedIndex = vocabularies.findIndex(voc=>voc.id!==vocId);
+            vocabularies.splice(deletedIndex,1);
+            //同步刪除localStorage
+            context.dispatch("getLocalStorageVocabularies").then(userVocabularies=>{
+                const newUserVocabularies = userVocabularies.filter(voc=>voc.id!==vocId);
+                localStorage.setItem("user_vocabularies",JSON.stringify(newUserVocabularies));
+            })
         }
     },
     //mutations負責更新狀態(state)
