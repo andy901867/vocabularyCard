@@ -86,9 +86,7 @@ const store = new Vuex.Store({
             });
         },
         deleteVocabulary(context,vocId){
-            const vocabularies = context.state.vocabularies;
-            const deletedIndex = vocabularies.findIndex(voc=>voc.id!==vocId);
-            vocabularies.splice(deletedIndex,1);
+            context.commit('setDeleteVocabulary',vocId);
             //同步刪除localStorage
             context.dispatch("getLocalStorageVocabularies").then(userVocabularies=>{
                 const newUserVocabularies = userVocabularies.filter(voc=>voc.id!==vocId);
@@ -106,6 +104,12 @@ const store = new Vuex.Store({
         },
         setAddVocabulary(state,newVoc){
             state.vocabularies.push(newVoc);
+        },
+        setDeleteVocabulary(state,vocId){
+            const deletedIndex = state.vocabularies.findIndex(voc=>voc.id!==vocId);
+            if (deletedIndex !== -1) {
+                state.vocabularies.splice(deletedIndex, 1);
+            }
         }
     }
 });

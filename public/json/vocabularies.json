@@ -2,25 +2,30 @@
     "firstGroup":[
         {
             "id": "fjiex",
-            "name": "Andy",
-            "translate": "安迪"
+            "name": "Cat",
+            "translate": "貓"
         },
         {
             "id": "kmcid",
-            "name": "Alex",
-            "translate": "艾力克斯"
+            "name": "Dog",
+            "translate": "狗"
         }
     ],
     "secondGroup":[
         {
             "id": "fesfc",
             "name": "Feet",
-            "translate": "腳丫"
+            "translate": "腳"
         },
         {
             "id": "qwdvs",
             "name": "Face",
             "translate": "臉"
+        },
+        {
+            "id": "jckle",
+            "name": "Hand",
+            "translate": "手"
         }
     ]
 }

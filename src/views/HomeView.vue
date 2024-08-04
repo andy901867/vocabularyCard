@@ -2,14 +2,12 @@
   <div class="home">
     <!-- <img alt="Vue logo" src="../assets/logo.png">     -->
     <div class="container py-4">
-      <div class="row">
-        <div class="col-4" v-for="cardGroup in cardGroups" :key="cardGroup.groupId">
+      <div class="row g-3">
+        <div class="col-md-4" v-for="cardGroup in cardGroups" :key="cardGroup.groupId">
           <div class="card">
             <a href="#" v-on:click.prevent="goToCardGroupPage(cardGroup)" class="text-decoration-none text-dark">
               <div class="card-body shadow-sm">
-                <h5 class="card-title"><i class="fa-solid fa-address-book"></i>{{cardGroup.name}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <h3 class="card-title mb-0"><i class="fa-solid fa-address-book me-2"></i>{{cardGroup.name}}</h3>
               </div>
             </a>          
           </div>

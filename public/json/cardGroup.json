@@ -2,11 +2,11 @@
     "data":[
         {
             "groupId": "firstGroup",
-            "name": "group A"
+            "name": "動物"
         },
         {
             "groupId": "secondGroup",
-            "name": "group B"
+            "name": "身體"
         }
     ]
 }
